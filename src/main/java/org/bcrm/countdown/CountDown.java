@@ -5,12 +5,14 @@ package org.bcrm.countdown;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -22,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class CoundDown {
+public class CountDown {
 
 	private Option hour = new Option("h", "hour", true, "Number of hour(s) to count down");
 	private Option minute = new Option("m", "minute", true, "Number of minute(s) to count down");
@@ -32,26 +34,30 @@ public class CoundDown {
 	private Option verbose = new Option("v", "verbose", false, "Turn on verbosity");
 	private Options options;
 	private CommandLineParser parser;
-	private CommandLine cmd;
+	private CommandLine cl;
 	private File file;
-	private ClockCount cpt;
+	private ClockCount cc;
 
-	private CoundDown(String[] args) throws ParseException {
+	private CountDown(String[] args) throws ParseException {
 		options = new Options();
+		hour.setRequired(true);
 		options.addOption(hour);
+		minute.setRequired(true);
 		options.addOption(minute);
+		second.setRequired(true);
 		options.addOption(second);
 		options.addOption(help);
+		fileName.setRequired(true);
 		options.addOption(fileName);
 		options.addOption(verbose);
 
 		parser = new DefaultParser();
 
-		cmd = parser.parse(options, args);
+		cl = parser.parse(options, args);
 
-		cpt = new ClockCount(Integer.valueOf(cmd.getOptionValue(hour)), Integer.valueOf(cmd.getOptionValue(minute)),
-				Integer.valueOf(cmd.getOptionValue(second)));
-		file = new File(new File(cmd.getOptionValue(fileName)).getAbsolutePath());
+		cc = new ClockCount(Integer.valueOf(cl.getOptionValue(hour)), Integer.valueOf(cl.getOptionValue(minute)),
+				Integer.valueOf(cl.getOptionValue(second)));
+		file = new File(new File(cl.getOptionValue(fileName)).getAbsolutePath());
 	}
 
 	private void showCommandline() {
@@ -59,16 +65,27 @@ public class CoundDown {
 	}
 
 	private void writeCpt() throws IOException {
-		Files.writeString(file.toPath(), cpt.valueString(), StandardCharsets.UTF_8);
+		Files.writeString(file.toPath(), cc.valueString(), StandardCharsets.UTF_8);
 	}
 
 	private void runCountDown() throws InterruptedException, IOException {
-		while (!cpt.isFishied()) {
-			log.info(cpt.valueString());
-			cpt.decrement();
+		while (!cc.isFishied()) {
+			log.info(cc.valueString());
+			cc.decrement();
 			Thread.sleep(1000);
 			this.writeCpt();
 		}
+	}
+
+	private void printHelp() {
+		HelpFormatter formatter = new HelpFormatter();
+		PrintWriter writer = new PrintWriter(System.out);
+		formatter.printUsage(writer, 80, "CountDown", options);
+		writer.flush();
+	}
+
+	private boolean isHelpRequierd() {
+		return cl.hasOption(help);
 	}
 
 	/**
@@ -78,11 +95,15 @@ public class CoundDown {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-		CoundDown cd = new CoundDown(args);
+		CountDown cd = new CountDown(args);
 
-		cd.showCommandline();
-		cd.writeCpt();
-		cd.runCountDown();
+		if (cd.isHelpRequierd()) {
+			cd.printHelp();
+		} else {
+			cd.showCommandline();
+			cd.writeCpt();
+			cd.runCountDown();
+		}
 	}
 
 }
