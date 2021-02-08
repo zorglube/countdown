@@ -70,7 +70,10 @@ public class CountDown {
 
 	private void runCountDown() throws InterruptedException, IOException {
 		while (!cc.isFishied()) {
-			log.info(cc.valueString());
+
+			if (cl.hasOption(verbose))
+				log.info(cc.valueString());
+
 			cc.decrement();
 			Thread.sleep(1000);
 			this.writeCpt();
