@@ -24,14 +24,14 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class CountDown {
+public class CountDown implements Runnable {
 
 	private Option hour = new Option("h", "hour", true, "Number of hour(s) to count down");
 	private Option minute = new Option("m", "minute", true, "Number of minute(s) to count down");
 	private Option second = new Option("s", "second", true, "Number of second(s) to count down");
 	private Option help = new Option("H", "help", false, "Show the help");
 	private Option fileName = new Option("f", "file", true, "The out file");
-	private Option verbose = new Option("v", "verbose", false, "Turn on verbosity");
+	private Option verbose = new Option("v", "verbose", false, "Turn on verbose");
 	private Options options;
 	private CommandLineParser parser;
 	private CommandLine cl;
@@ -61,23 +61,11 @@ public class CountDown {
 	}
 
 	private void showCommandline() {
-		options.getOptions().stream().forEach(options -> log.info(options.toString()));
+		options.getOptions().stream().forEach(o -> log.info("{}", o));
 	}
 
 	private void writeCpt() throws IOException {
 		Files.writeString(file.toPath(), cc.valueString(), StandardCharsets.UTF_8);
-	}
-
-	private void runCountDown() throws InterruptedException, IOException {
-		while (!cc.isFishied()) {
-
-			if (cl.hasOption(verbose))
-				log.info(cc.valueString());
-
-			cc.decrement();
-			Thread.sleep(1000);
-			this.writeCpt();
-		}
 	}
 
 	private void printHelp() {
@@ -105,7 +93,29 @@ public class CountDown {
 		} else {
 			cd.showCommandline();
 			cd.writeCpt();
-			cd.runCountDown();
+			cd.run();
+		}
+	}
+
+	@Override
+	public void run() {
+		try {
+			while (!cc.isFishied()) {
+
+				if (cl.hasOption(verbose))
+					log.info(cc.valueString());
+
+				cc.decrement();
+				Thread.sleep(1000);
+				this.writeCpt();
+			}
+			Thread.currentThread().interrupt();
+		} catch (InterruptedException e) {
+			log.debug("InterruptException cause: {}, message: {}", e.getCause(), e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			log.debug("IOException cause:{}, message: {}", e.getCause(), e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

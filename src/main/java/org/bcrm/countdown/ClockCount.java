@@ -10,11 +10,8 @@ package org.bcrm.countdown;
 public class ClockCount {
 
 	private int h;
-	private String hh;
 	private int m;
-	private String mm;
 	private int s;
-	private String ss;
 	private boolean end = false;
 
 	public ClockCount(int hour, int minute, int second) {
@@ -25,10 +22,10 @@ public class ClockCount {
 			end = true;
 	}
 
-	public synchronized String valueString() {
-		hh = h < 10 ? String.format("0%d", h) : String.format("%d", h);
-		mm = m < 10 ? String.format("0%d", m) : String.format("%d", m);
-		ss = s < 10 ? String.format("0%d", s) : String.format("%d", s);
+	synchronized String valueString() {
+		String hh = String.format(h < 10 ? "0%d" : "%d", h);
+		String mm = String.format(m < 10 ? "0%d" : "%d", m);
+		String ss = String.format(s < 10 ? "0%d" : "%d", s);
 		return String.format("%s:%s:%s", hh, mm, ss);
 	}
 
