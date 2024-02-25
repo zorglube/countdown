@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.bcrm.countdown;
 
@@ -16,27 +16,28 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author zorglube
  *
  */
-@Slf4j
 public class CountDown implements Runnable {
 
-	private Option hour = new Option("h", "hour", true, "Number of hour(s) to count down");
-	private Option minute = new Option("m", "minute", true, "Number of minute(s) to count down");
-	private Option second = new Option("s", "second", true, "Number of second(s) to count down");
-	private Option help = new Option("H", "help", false, "Show the help");
-	private Option fileName = new Option("f", "file", true, "The out file");
-	private Option verbose = new Option("v", "verbose", false, "Turn on verbose");
-	private Options options;
-	private CommandLineParser parser;
-	private CommandLine cl;
-	private File file;
-	private ClockCount cc;
+	private static final Logger log = LoggerFactory.getLogger(CountDown.class);
+
+	private final Option hour = new Option("h", "hour", true, "Number of hour(s) to count down");
+	private final Option minute = new Option("m", "minute", true, "Number of minute(s) to count down");
+	private final Option second = new Option("s", "second", true, "Number of second(s) to count down");
+	private final Option help = new Option("H", "help", false, "Show the help");
+	private final Option fileName = new Option("f", "file", true, "The out file");
+	private final Option verbose = new Option("v", "verbose", false, "Turn on verbose");
+	private final Options options;
+	private final CommandLineParser parser;
+	private final CommandLine cl;
+	private final File file;
+	private final ClockCount cc;
 
 	private CountDown(String[] args) throws ParseException {
 		options = new Options();
@@ -55,8 +56,8 @@ public class CountDown implements Runnable {
 
 		cl = parser.parse(options, args);
 
-		cc = new ClockCount(Integer.valueOf(cl.getOptionValue(hour)), Integer.valueOf(cl.getOptionValue(minute)),
-				Integer.valueOf(cl.getOptionValue(second)));
+		cc = new ClockCount(Integer.parseInt(cl.getOptionValue(hour)), Integer.parseInt(cl.getOptionValue(minute)),
+				Integer.parseInt(cl.getOptionValue(second)));
 		file = new File(new File(cl.getOptionValue(fileName)).getAbsolutePath());
 	}
 
@@ -69,8 +70,8 @@ public class CountDown implements Runnable {
 	}
 
 	private void printHelp() {
-		HelpFormatter formatter = new HelpFormatter();
-		PrintWriter writer = new PrintWriter(System.out);
+		final HelpFormatter formatter = new HelpFormatter();
+		final PrintWriter writer = new PrintWriter(System.out);
 		formatter.printUsage(writer, 80, "CountDown", options);
 		writer.flush();
 	}
@@ -86,7 +87,7 @@ public class CountDown implements Runnable {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-		CountDown cd = new CountDown(args);
+		final CountDown cd = new CountDown(args);
 
 		if (cd.isHelpRequierd()) {
 			cd.printHelp();
@@ -102,18 +103,19 @@ public class CountDown implements Runnable {
 		try {
 			while (!cc.isFishied()) {
 
-				if (cl.hasOption(verbose))
+				if (cl.hasOption(verbose)) {
 					log.info(cc.valueString());
+				}
 
 				cc.decrement();
 				Thread.sleep(1000);
-				this.writeCpt();
+				writeCpt();
 			}
 			Thread.currentThread().interrupt();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			log.debug("InterruptException cause: {}, message: {}", e.getCause(), e.getMessage());
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			log.debug("IOException cause:{}, message: {}", e.getCause(), e.getMessage());
 			e.printStackTrace();
 		}
