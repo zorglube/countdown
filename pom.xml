@@ -33,7 +33,7 @@
 	<properties>
 		<maven.compiler.target>13</maven.compiler.target>
 		<maven.compiler.source>13</maven.compiler.source>
-		<lombok.version>1.18.18</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 		<commons-cli.version>1.6-SNAPSHOT</commons-cli.version>
 		<slf4j-simple.version>1.7.30</slf4j-simple.version>
 	</properties>
