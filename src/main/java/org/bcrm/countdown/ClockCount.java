@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.bcrm.countdown;
 
@@ -15,11 +15,12 @@ public class ClockCount {
 	private boolean end = false;
 
 	public ClockCount(int hour, int minute, int second) {
-		this.h = hour;
-		this.m = minute;
-		this.s = second;
-		if (h == 0 && m == 0 && s == 0)
+		h = hour;
+		m = minute;
+		s = second;
+		if (h == 0 && m == 0 && s == 0) {
 			end = true;
+		}
 	}
 
 	synchronized String valueString() {
