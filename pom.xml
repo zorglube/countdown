@@ -32,6 +32,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}.exe</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -58,7 +59,6 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-
 							<archive>
 								<manifest>
 									<mainClass>org.bcrm.countdown.CountDown</mainClass>
